@@ -1,6 +1,6 @@
 # Rust BitTorrent Client
 
-## A BitTorrent client built from scratch in Rust. Implements:
+A BitTorrent client built from scratch in Rust. Implements:
 
 - `.torrent` parsing
 - Tracker communication
