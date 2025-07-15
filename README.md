@@ -1,35 +1,51 @@
-[![progress-banner](https://backend.codecrafters.io/progress/bittorrent/f1d7e199-bcd5-45e6-b8bc-4fbc8587c212)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+# Rust BitTorrent Client
 
-This is a starting point for Rust solutions to the
-["Build Your Own BitTorrent" Challenge](https://app.codecrafters.io/courses/bittorrent/overview).
+## A BitTorrent client built from scratch in Rust. Implements:
 
-In this challenge, you’ll build a BitTorrent client that's capable of parsing a
-.torrent file and downloading a file from a peer. Along the way, we’ll learn
-about how torrent files are structured, HTTP trackers, BitTorrent’s Peer
-Protocol, pipelining and more.
+- `.torrent` parsing
+- Tracker communication
+- Peer handshake
+- Piece download and verification
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+> Originally inspired by Codecrafters, now extended as a standalone project.
 
-# Passing the first stage
+## Run
 
-The entry point for your BitTorrent implementation is in `src/main.rs`. Study
-and uncomment the relevant code, and push your changes to pass the first stage:
-
-```sh
-git commit -am "pass 1st stage" # any msg
-git push origin master
+```bash
+cargo run sample.torrent
 ```
 
-Time to move on to the next stage!
+```bash
+cargo build --release
+./target/release/bittorrent-rust-client path/to/file.torrent
+```
 
-# Stage 2 & beyond
+## Project Structure:
 
-Note: This section is for stages 2 and beyond.
+- src/torrent.rs – Torrent file parsing and info hash computation
 
-1. Ensure you have `cargo (1.87)` installed locally
-1. Run `./your_program.sh` to run your program, which is implemented in
-   `src/main.rs`. This command compiles your Rust project, so it might be slow
-   the first time you run it. Subsequent runs will be fast.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+- src/tracker.rs – Tracker communication via HTTP GET requests
+
+- src/peer.rs – Peer connection, handshake, and piece requests
+
+- src/download.rs – Piece management and writing to disk
+
+- src/utils.rs – Common helper functions
+
+- src/main.rs – CLI entry point using clap
+
+## Dependencies
+### This project uses the following crates:
+
+- serde, serde_bencode, serde_json, serde_urlencoded – for parsing and encoding data
+
+- reqwest, tokio – for async HTTP tracker communication
+
+- sha1, rand, bytes – for protocol implementation
+
+- clap – for CLI interface
+
+- anyhow, thiserror – for error handling
+
+## Author
+Aayushman – https://github.com/Aayushman00
