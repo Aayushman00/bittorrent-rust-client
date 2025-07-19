@@ -43,8 +43,6 @@ cargo build --release
 
 - sha1, rand, bytes – for protocol implementation
 
-- clap – for CLI interface
-
 - anyhow, thiserror – for error handling
 
 ## Author
