@@ -105,7 +105,7 @@ pub fn download_piece_to_buffer(
 ) -> Vec<u8> {
     let mut stream = TcpStream::connect(peer_addr).expect("Failed to connect to peer");
 
-    // --- Handshake ---
+    // we are doing handshake here (for more info refer handshake.rs) 
     let mut handshake = Vec::new();
     handshake.push(19);
     handshake.extend_from_slice(b"BitTorrent protocol");
@@ -117,7 +117,7 @@ pub fn download_piece_to_buffer(
     let mut buf = [0u8; 68];
     stream.read_exact(&mut buf).unwrap();
 
-    // --- Bitfield ---
+    // this represents the bitfield
     let mut len_buf = [0u8; 4];
     stream.read_exact(&mut len_buf).unwrap();
     let msg_len = u32::from_be_bytes(len_buf);
@@ -128,18 +128,17 @@ pub fn download_piece_to_buffer(
     }
     let mut bitfield = vec![0u8; (msg_len - 1) as usize];
     stream.read_exact(&mut bitfield).unwrap();
-
-    // --- Interested ---
+    
     stream.write_all(&[0, 0, 0, 1, 2]).unwrap();
 
-    // --- Wait for unchoke ---
+    // wait for unchoke
     stream.read_exact(&mut len_buf).unwrap();
     stream.read_exact(&mut msg_id).unwrap();
     if msg_id[0] != 1 {
         panic!("Expected unchoke");
     }
 
-    // --- Download piece ---
+    // donwloading piece here
     let block_size = 16 * 1024;
     let mut piece_data = vec![0u8; piece_length.min(total_length - (piece_index as usize * piece_length))];
     let mut offset = 0;
@@ -147,7 +146,7 @@ pub fn download_piece_to_buffer(
     while offset < piece_data.len() {
         let len = block_size.min(piece_data.len() - offset);
 
-        // request block
+        // requesting a block from the peer 
         let mut req = Vec::new();
         req.extend_from_slice(&13u32.to_be_bytes());
         req.push(6);
@@ -156,20 +155,21 @@ pub fn download_piece_to_buffer(
         req.extend_from_slice(&(len as u32).to_be_bytes());
         stream.write_all(&req).unwrap();
 
-        // receive block
+        // recieve the requested block
         stream.read_exact(&mut len_buf).unwrap();
         stream.read_exact(&mut msg_id).unwrap();
         if msg_id[0] != 7 {
             panic!("Expected piece");
         }
 
-        let mut header = [0u8; 8]; // index + begin
+        // header is the index + begin
+        let mut header = [0u8; 8]; 
         stream.read_exact(&mut header).unwrap();
         stream.read_exact(&mut piece_data[offset..offset + len]).unwrap();
         offset += len;
     }
 
-    // --- Validate hash ---
+    // validate the hash if the piece hash is correctly recieved or not
     let mut hasher = Sha1::new();
     hasher.update(&piece_data);
     let hash = hasher.finalize();
