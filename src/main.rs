@@ -1,17 +1,16 @@
 use std::env;
 
-mod utils;
-use utils::print_info;
-
-mod peer;
-use peer::print_peers;
-
-mod handshake;
-use handshake::send_handshake;
-
+mod bencode;
 mod download;
-use download::{download_cmd, download_piece_cmd};
+mod handshake;
+mod peer;
+mod torrent;
+mod tracker;
 
+use download::{download_cmd, download_piece_cmd};
+use handshake::send_handshake;
+use torrent::{decode_bencoded_value, print_info};
+use tracker::print_peers;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -28,7 +27,7 @@ fn main() {
                 std::process::exit(1);
             }
             let encoded_value = args[2].as_bytes();
-            let decoded = utils::decode_bencoded_value(encoded_value);
+            let decoded = decode_bencoded_value(encoded_value);
             println!("{}", decoded);
         }
 
@@ -78,7 +77,6 @@ fn main() {
             let torrent_path = &args[4];
             download_cmd(output_path, torrent_path);
         }
-
 
         _ => {
             eprintln!("Unknown command: {}", args[1]);

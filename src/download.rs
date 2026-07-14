@@ -1,8 +1,9 @@
 use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::fs::write;
-use crate::utils::{decode_bencoded_value, extract_info_hash, extract_pieces_bytes, get_str, get_i64};
-use crate::peer::{get_first_peer, generate_peer_id};
+use crate::peer::generate_peer_id;
+use crate::torrent::{decode_bencoded_value, extract_info_hash, extract_pieces_bytes, get_i64, get_str};
+use crate::tracker::get_first_peer;
 use sha1::{Sha1, Digest};
 
 /// Used by: `./your_program download_piece -o file piece_index`
@@ -25,7 +26,7 @@ pub fn download_piece_cmd(
         panic!("Invalid piece index");
     }
 
-    let piece_hashes = extract_pieces_bytes(&torrent_bytes);
+    let piece_hashes = extract_pieces_bytes(&torrent_bytes).expect("Failed to extract pieces");
     let piece_hash = &piece_hashes[piece_index * 20..(piece_index + 1) * 20];
 
     let info_hash_bytes = hex::decode(extract_info_hash(&torrent_bytes)).unwrap();
@@ -64,7 +65,7 @@ pub fn download_cmd(
     let peer_id = generate_peer_id();
     let peer_addr = get_first_peer(announce, &info_hash_bytes, &peer_id, total_length);
 
-    let piece_hashes = extract_pieces_bytes(&torrent_bytes);
+    let piece_hashes = extract_pieces_bytes(&torrent_bytes).expect("Failed to extract pieces");
     let num_pieces = (total_length + piece_length - 1) / piece_length;
 
     let mut final_data = vec![0u8; total_length];

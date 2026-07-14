@@ -12,38 +12,63 @@ A BitTorrent client built from scratch in Rust. Implements:
 ## Run
 
 ```bash
-cargo run sample.torrent
+cargo run -- info sample.torrent
+cargo run -- peers sample.torrent
+cargo run -- handshake sample.torrent 127.0.0.1:6881
+cargo run -- download -o output.bin sample.torrent
 ```
 
 ```bash
 cargo build --release
-./target/release/bittorrent-rust-client path/to/file.torrent
+./target/release/bittorrent-rust-client info path/to/file.torrent
 ```
 
-## Project Structure:
+## Project Structure
 
-- src/torrent.rs – Torrent file parsing and info hash computation
+- `src/main.rs` – CLI entry point
+- `src/bencode.rs` – Low-level bencode byte-range lookup
+- `src/torrent.rs` – Torrent file parsing, info hash, and piece hashes
+- `src/tracker.rs` – Tracker HTTP requests and peer list parsing
+- `src/peer.rs` – Peer ID generation
+- `src/handshake.rs` – BitTorrent peer handshake
+- `src/download.rs` – Piece download and file assembly
 
-- src/tracker.rs – Tracker communication via HTTP GET requests
+```
+flowchart TB
+    main[main.rs - CLI router]
+    bencode[bencode.rs - byte-range lookup]
+    torrent[torrent.rs - torrent parsing]
+    tracker[tracker.rs - tracker HTTP]
+    peer[peer.rs - peer ID]
+    handshake[handshake.rs - handshake]
+    download[download.rs - piece download]
 
-- src/peer.rs – Peer connection, handshake, and piece requests
-
-- src/download.rs – Piece management and writing to disk
-
-- src/utils.rs – Common helper functions
-
-- src/main.rs – CLI entry point using clap
+    main --> torrent
+    main --> tracker
+    main --> handshake
+    main --> download
+    torrent --> bencode
+    bencode --> torrent
+    tracker --> torrent
+    tracker --> peer
+    handshake --> torrent
+    download --> torrent
+    download --> tracker
+    download --> peer
+```
 
 ## Dependencies
-### This project uses the following crates:
 
-- serde, serde_bencode, serde_json, serde_urlencoded – for parsing and encoding data
-
-- reqwest, tokio – for async HTTP tracker communication
-
-- sha1, rand, bytes – for protocol implementation
-
-- anyhow, thiserror – for error handling
+- serde, serde_json – JSON and bencode decoding
+- reqwest – HTTP tracker communication
+- sha1, hex – info hash and piece verification
+- anyhow – error handling
+- rand – peer ID generation
 
 ## Author
-Aayushman – https://github.com/Aayushman00
+
+Aayushman00 – https://github.com/Aayushman00
+
+## License
+
+MIT License. See [LICENSE](LICENSE).

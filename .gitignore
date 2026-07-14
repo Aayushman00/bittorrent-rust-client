@@ -1,5 +1,30 @@
-/target
+# Build output
+/target/
+
+# Backup files
 **/*.rs.bk
-Cargo.lock
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Logs
 *.log
+
+# Downloaded piece / test artifacts
+piece*.bin
+*.torrent
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.*
+
+# Debug symbols
+*.pdb
