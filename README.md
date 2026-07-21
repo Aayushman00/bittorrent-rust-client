@@ -33,7 +33,7 @@ cargo build --release
 - `src/handshake.rs` – BitTorrent peer handshake
 - `src/download.rs` – Piece download and file assembly
 
-```
+```mermaid
 flowchart TB
     main[main.rs - CLI router]
     bencode[bencode.rs - byte-range lookup]
